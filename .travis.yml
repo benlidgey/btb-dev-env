@@ -1,0 +1,7 @@
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y libxml2-dev
+  
+script:
+- packer validate dev-env.json
+- packer build dev-env.json
