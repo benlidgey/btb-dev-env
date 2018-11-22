@@ -1,0 +1,96 @@
+{
+  "variables": {
+    "iso_checksum": "a5b0ea5918f850124f3d72ef4b85bda82f0fcd02ec721be19c1a6952791c8ee8",
+    "iso_checksum_type": "sha256",
+    "iso_file": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04.1-server-amd64.iso",
+    "vm_name": "{{env `ATLAS_NAME`}}",
+    "vm_type": "Ubuntu_64",
+    "vm_cpus": "4",
+    "vm_ram_size": "8192",
+    "vm_vram_size": "64",
+    "vm_disk_size": "30720"
+  },
+  "builders": [
+    {
+    "name": "vbox",
+    "type": "virtualbox-iso",
+    "boot_keygroup_interval": "500ms",
+    "boot_command": [
+      "<esc><wait>",
+      "<esc><wait>",
+      "<enter><wait>",
+      "/install/vmlinuz",
+      " auto",
+      " console-setup/ask_detect=false",
+      " console-setup/layoutcode=gb",
+      " console-setup/modelcode=pc105",
+      " debconf/frontend=noninteractive",
+      " debian-installer=en_GB",
+      " fb=false",
+      " initrd=/install/initrd.gz",
+      " kbd-chooser/method=gb",
+      " keyboard-configuration/layout=UK",
+      " keyboard-configuration/variant=UK",
+      " locale=en_GB",
+      " netcfg/get_domain=vm",
+      " netcfg/get_hostname=vagrant",
+      " grub-installer/bootdev=/dev/sda",
+      " noapic",
+      " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+      " --",
+      " <enter><wait>"
+    ],
+    "boot_wait": "10s",
+    "disk_size": "{{user `vm_disk_size`}}",
+    "format": "ova",
+    "guest_os_type": "{{user `vm_type`}}",
+    "headless": true,
+    "http_directory": "http",
+    "iso_checksum": "{{user `iso_checksum`}}",
+    "iso_checksum_type": "{{user `iso_checksum_type`}}",
+    "iso_interface": "sata",
+    "iso_url": "{{user `iso_file`}}",
+    "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+    "shutdown_timeout": "5m",
+    "ssh_username": "vagrant",
+    "ssh_password": "{{user `sudo_password`}}",
+    "ssh_port": 22,
+    "ssh_wait_timeout": "10000s",
+    "vboxmanage": [
+      [
+        "modifyvm",
+        "{{.Name}}",
+        "--cpus",
+        "{{user `vm_cpus`}}"
+      ],
+      [
+        "modifyvm",
+        "{{.Name}}",
+        "--memory",
+        "{{user `vm_ram_size`}}"
+      ],
+      [
+        "modifyvm",
+        "{{.Name}}",
+        "--vram",
+        "{{user `vm_vram_size`}}"
+      ]
+    ],
+    "virtualbox_version_file": ".vbox_version"
+  }
+],
+"description": "A developer environment using the Ubuntu OS",
+"post-processors": [
+  [
+    {
+      "compression_level": 9,
+      "only": [
+        "vbox"
+      ],
+      "output": "{{user `vagrant_box_file`}}",
+      "type": "vagrant",
+      "vagrantfile_template": "Vagrantfile.template"
+    }
+  ]
+]
+}
