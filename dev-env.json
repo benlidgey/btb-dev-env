@@ -10,6 +10,36 @@
     "vm_vram_size": "64",
     "vm_disk_size": "30720"
   },
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/ansible.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/setup.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "./ansible/main.yml",
+      "role_paths": [
+        "./ansible/roles/git",
+        "./ansible/roles/maven",
+        "./ansible/roles/desktop"
+      ],
+      "galaxy_file": "requirements.yml"
+    },
+    {
+      "execute_command": "echo '{{user `sudo_password`}}' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+      "only": [
+        "vbox"
+      ],
+      "script": "scripts/cleanup.sh",
+      "type": "shell"
+    }
+  ],
   "builders": [
     {
     "name": "vbox",

@@ -2,7 +2,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 # Box / OS
-VAGRANT_BOX = 'ubuntu/trusty64'
+VAGRANT_BOX = 'ubuntu/bionic64'
 # Memorable name for your
 VM_NAME = 'dev-env'
 # VM User — 'vagrant' by default
@@ -36,6 +36,7 @@ Vagrant.configure(2) do |config|
   # Install Git, Node.js 6.x.x, Latest npm
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
+    apt-get install -y ansible
     apt-get install -y git
     curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
     apt-get install -y openjdk-8-jre
@@ -43,4 +44,14 @@ Vagrant.configure(2) do |config|
     apt-get upgrade -y
     apt-get autoremove -y
   SHELL
+end
+
+Vagrant.configure("2") do |config|
+  #
+  # Run Ansible from the Vagrant Host
+  #
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "main.yml"
+  end
+
 end
